@@ -1,0 +1,104 @@
+{{ define "pagination" }}
+  {{ if .Count }}
+    <div
+      class="flex items-center justify-between gap-4 px-2 py-3 mb-2 bg-white mobile:grid mobile:grid-cols-2 pagination"
+    >
+      <div class="flex items-center justify-start gap-1">
+        {{ if .HasPrev }}
+          <a
+            class="button light first_page"
+            title="First Page"
+            href="?page=1&limit={{ .PageSize }}"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              class="w-5 h-5"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M15.79 14.77a.75.75 0 01-1.06.02l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 111.04 1.08L11.832 10l3.938 3.71a.75.75 0 01.02 1.06zm-6 0a.75.75 0 01-1.06.02l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 111.04 1.08L5.832 10l3.938 3.71a.75.75 0 01.02 1.06z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </a>
+          <a
+            class="button light prev_page"
+            title="Previous Page"
+            href="?page={{ minus .Page  1 }}&limit={{ .PageSize }}"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              class="w-5 h-5"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </a>
+        {{ end }}
+
+
+        <button class="button info" tabindex="-1" class="!pointer-events-none tablet:hidden">
+          Page {{ .Page }} /
+          {{ .TotalPages }}
+        </button>
+
+        {{ if .HasNext }}
+          <a
+            class="button light next_page"
+            title="First Page"
+            href="?page={{ plus .Page 1 }}&limit={{ .PageSize }}"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              class="w-5 h-5"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </a>
+        {{ end }}
+        {{ if .HasNext }}
+          <a
+            class="button light last_page"
+            title="Last Page"
+            href="?page={{ .TotalPages }}&limit={{ .PageSize }}"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              class="w-5 h-5"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M10.21 14.77a.75.75 0 01.02-1.06L14.168 10 10.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                clip-rule="evenodd"
+              />
+              <path
+                fill-rule="evenodd"
+                d="M4.21 14.77a.75.75 0 01.02-1.06L8.168 10 4.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </a>
+        {{ end }}
+        <span
+          class="inline-block p-1 ml-2 text-white border-2 rounded border-cyan-400 bg-cyan-800 whitespace-nowrap"
+          >{{ .Count }} record{{ if gt .Count 0 }}s{{ end }}</span
+        >
+      </div>
+    </div>
+  {{ end }}
+{{ end }}

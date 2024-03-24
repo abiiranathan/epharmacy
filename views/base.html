@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Electronic Pharmacy management system" />
+    <meta name="keywords" content="Electronic, Pharmacy, System" />
+    <meta name="author" content="Abiira Nathan" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="white" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="black" />
+
+    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="shortcut icon" href="/static/logo-192.png" type="image/png" />
+    <link rel="manifest" href="/static/manifest.json" />
+    <title>EPharmacy</title>
+
+    <noscript>
+      <div class="grid p-12 place-items-center">
+        <h1 class="my-3 text-3xl">JavaScript is disabled</h1>
+        <p>Please enable JavaScript to use this application</p>
+      </div>
+
+      <style type="text/css">
+        main {
+          display: none;
+        }
+      </style>
+    </noscript>
+  </head>
+
+  <body>
+    <main>
+      {{ template "header" . }}
+      <div class="p-8 pb-12" id="layout">{{ .content }}</div>
+    </main>
+  </body>
+</html>

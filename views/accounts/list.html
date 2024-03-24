@@ -1,0 +1,63 @@
+<div class="max-w-5xl p-8 mx-auto">
+  <h1 class="text-3xl font-black">User Accounts</h1>
+  <a class="mt-3 mb-1 button" href="/users/new/account">New Account</a>
+  <hr />
+
+  <table class="table w-full bg-white table-bordered">
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Is Active</th>
+        <th>IsAdmin</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{ range .users }}
+        <tr>
+          <td>{{ .Username }}</td>
+          <td>{{ if .IsActive }}YES{{ else }}NO{{ end }}</td>
+          <td>{{ if .IsAdmin }}YES{{ else }}NO{{ end }}</td>
+          <td>
+            <div class="flex items-center gap-x-4">
+              {{ if .IsActive }}
+                <form action="/users/deactivate/{{ .ID }}" method="post">
+                  <button type="submit" class="button btn-danger">Deactivate</button>
+                </form>
+              {{ else }}
+                <form action="/users/activate/{{ .ID }}" method="post">
+                  <button type="submit" class="button btn-success">Activate</button>
+                </form>
+              {{ end }}
+
+
+              <!-- Promote -->
+              {{ if .IsAdmin }}
+                <form
+                  action="/users/demote/{{ .ID }}"
+                  method="post"
+                  title="Revoke admin permissions"
+                >
+                  <button type="submit" class="button btn-danger">Demote</button>
+                </form>
+              {{ else }}
+                <form action="/users/promote/{{ .ID }}" method="post">
+                  <button type="submit" class="button btn-success" title="Promote to admin">
+                    Promote
+                  </button>
+                </form>
+              {{ end }}
+
+
+              <a class="button" href="/users/edit/{{ .ID }}">Edit</a>
+
+              <form action="/users/delete/{{ .ID }}" method="post">
+                <button type="submit" class="button btn-danger">Delete</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+      {{ end }}
+    </tbody>
+  </table>
+</div>

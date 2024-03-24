@@ -1,0 +1,82 @@
+<div class="p-4 bg-orange-100 rounded">
+  <h1 class="py-2 my-4 text-3xl font-bold text-gray-800">Inventory List</h1>
+
+  <div class="flex justify-between gap-2 mt-4">
+    <div class="flex items-center gap-2">
+      <a href="/products/create" class="button">Add Product</a>
+      <a href="/products/import" class="button">Import Products</a>
+    </div>
+
+    <div class="flex gap-2">
+      <input
+        type="search"
+        id="search"
+        class="input input-bordered"
+        placeholder="Search by generic or brand name"
+      />
+    </div>
+  </div>
+</div>
+
+<div class="table-scroll">
+  <table class="table w-full table-bordered">
+    <thead>
+      <tr>
+        <th>Product ID</th>
+        <th>Generic Name</th>
+        <th>Brand</th>
+        <th>Cost Price</th>
+        <th>Selling Price</th>
+        <th>In Stock</th>
+        <th>Expiry Dates / Time TO Expire</th>
+        <th>Barcode</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {{ template "products" . }}
+    </tbody>
+  </table>
+</div>
+{{ template "pagination" . }}
+
+<script>
+  const search = document.getElementById("search");
+  const target = document.querySelector("tbody");
+  const barcodeInput = document.getElementById("barcode");
+
+  async function handleSearch() {
+    const searchValue = search.value;
+    const url = `/products/search?name=${searchValue}&limit=20&type=html`;
+
+    const response = await fetch(url);
+    const data = await response.text();
+    if (response.ok) {
+      target.innerHTML = data;
+    } else {
+      console.error(data);
+    }
+  }
+
+  function barcodeSearch() {
+    const searchValue = barcodeInput.value.trim();
+    const url = `/products/search/barcode/${searchValue}?type=html`;
+
+    fetch(url)
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error(await response.text());
+        }
+        return response.text();
+      })
+      .then((data) => {
+        barcodeInput.value = "";
+        target.innerHTML = data;
+      })
+      .catch(console.error);
+  }
+
+  search.addEventListener("keyup", handleSearch);
+  barcodeInput.addEventListener("input", barcodeSearch);
+</script>

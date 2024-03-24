@@ -1,0 +1,92 @@
+<div class="max-w-5xl mx-auto">
+  <h1 class="mb-4 text-3xl font-black">Insert a new product</h1>
+
+  <form
+    action="/products/create"
+    method="post"
+    enctype="multipart/form-data"
+    class="p-5 mx-auto space-y-3 bg-indigo-100 border rounded-md"
+  >
+    <div>
+      <label for="generic_name">Generic Name</label>
+      <input
+        type="text"
+        name="generic_name"
+        id="generic_name"
+        value="{{ .product.GenericName }}"
+        placeholder="e.g. Tabs Paracetamol, Tabs Aspirin, etc."
+        required
+      />
+    </div>
+
+    <div>
+      <label for="brand_name">Brand Name</label>
+      <input
+        type="text"
+        name="brand_name"
+        id="brand_name"
+        value="{{ .product.BrandName }}"
+        placeholder="e.g. Panadol, Aspirin, etc."
+      />
+    </div>
+
+    <div>
+      <label for="quantity">Quantity</label>
+      <input
+        type="number"
+        name="quantity"
+        id="quantity"
+        placeholder="e.g. 100, 200, etc."
+        value="{{ .product.Quantity }}"
+        required
+      />
+    </div>
+
+    <div>
+      <label for="cost_price">Cost Price</label>
+      <input
+        type="number"
+        name="cost_price"
+        id="cost_price"
+        placeholder="e.g. 1000, 2000, etc."
+        value="{{ .product.CostPrice }}"
+        required
+      />
+    </div>
+
+    <div>
+      <label for="selling_price">Selling Price</label>
+      <input
+        type="number"
+        name="selling_price"
+        id="selling_price"
+        placeholder="e.g. 1200, 2200, etc."
+        value="{{ .product.SellingPrice }}"
+        required
+      />
+    </div>
+
+    <div>
+      <label for="barcode">Barcode</label>
+      <input
+        type="text"
+        name="barcode"
+        id="barcode"
+        value="{{ .product.Barcode }}"
+        placeholder="Scan product to insert barcode here"
+      />
+    </div>
+    <!-- expiry date array -->
+    <div>
+      <label for="expiry_dates">Expiry Dates</label>
+      <input
+        type="text"
+        name="expiry_dates"
+        id="expiry_dates"
+        value="{{ join_dates .product.ExpiryDates }}"
+        placeholder="e.g. 2022-12-31, 2023-01-01"
+      />
+    </div>
+    <button type="submit" class="button success">Insert Product</button>
+  </form>
+</div>

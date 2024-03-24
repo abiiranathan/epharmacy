@@ -1,0 +1,68 @@
+<div class="max-w-4xl mx-auto mt-10 bg-blue-100 p-10 border-2 drop-shadow-sm rounded-lg">
+  <h1 class="text-3xl">Update user account</h1>
+
+  <form
+    action="/users/{{ .user.ID }}"
+    enctype="multipart/form-data"
+    method="post"
+    class="max-w-2xl p-4"
+  >
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input
+        type="text"
+        name="username"
+        id="username"
+        class="form-control"
+        value="{{ .user.Username }}"
+        required
+        placeholder="Enter a unique username"
+      />
+    </div>
+
+    <div class="my-4 form-group">
+      <label for="password">Password</label>
+      <input
+        type="password"
+        name="password"
+        id="password"
+        value="{{ .user.Password }}"
+        class="form-control"
+        placeholder="Enter a password for the user(At least 8 characters)"
+        required
+      />
+    </div>
+
+    <div class="my-4 form-group">
+      <label for="password">Confirm Password</label>
+      <input
+        type="password"
+        name="password-confirm"
+        id="password-confirm"
+        value="{{ .user.Password }}"
+        class="form-control"
+        placeholder="Enter a password for the user(At least 8 characters)"
+        required
+      />
+    </div>
+    <button type="submit" class="button">Update Account</button>
+  </form>
+</div>
+
+<script>
+  const form = document.querySelector("form");
+  form.addEventListener("submit", (e) => {
+    const password = document.getElementById("password").value;
+    const passwordConfirm = document.getElementById("password-confirm").value;
+
+    if (password !== passwordConfirm) {
+      e.preventDefault();
+      alert("Passwords do not match");
+    }
+
+    if (password.length < 8) {
+      e.preventDefault();
+      alert("Password must be at least 8 characters");
+    }
+  });
+</script>

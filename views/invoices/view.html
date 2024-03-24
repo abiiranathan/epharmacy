@@ -1,0 +1,162 @@
+<div>
+  <h1 class="text-2xl font-black text-teal-700">INVOICE NO: {{ .invoice.InvoiceNumber }}</h1>
+  <div class="flex items-center p-2 bg-green-100 gap-x-8">
+    <p class="text-lg">Supplier: {{ .invoice.Supplier }}</p>
+    <p class="text-lg">Purchase Date: {{ .invoice.PurchaseDate }}</p>
+    <p class="text-lg">Invoice Total: {{ roundf64 .invoice.InvoiceTotal }}</p>
+    <p class="text-lg">Amount Paid: {{ roundf64 .invoice.AmountPaid }}</p>
+    <p class="text-lg">
+      Balance:
+      {{ roundf64 (minusf .invoice.InvoiceTotal .invoice.AmountPaid) }}
+    </p>
+    <p class="text-lg">User: {{ .invoice.UserID }}</p>
+    <p class="text-lg">Created At: {{ .invoice.CreatedAt.Format "2006-01-02 15:04:05" }}</p>
+  </div>
+
+  <form
+    action="/stockin/create"
+    method="post"
+    enctype="multipart/form-data"
+    class="p-5 mx-auto mt-2 space-y-3 bg-pink-100 border rounded-md"
+  >
+    <h2 class="my-2 text-xl uppercase">Add product to invoice</h2>
+    <div class="grid items-center grid-cols-5 gap-4">
+      <div class="hidden">
+        <label for="invoice_id">Product ID</label>
+        <input type="number" name="invoice_id" id="invoice_id" required value="{{ .invoice.ID }}" />
+      </div>
+      <div class="hidden">
+        <!-- Product ID will be set by Javascript. -->
+        <label for="product_id">Product ID</label>
+        <input type="number" name="product_id" id="product_id" placeholder="Product ID" required />
+      </div>
+
+      <div class="relative">
+        <label for="product_name">Product Name</label>
+        <input type="text" id="product_name" placeholder="Product Name" list="results" required />
+        <datalist id="results"></datalist>
+      </div>
+
+      <div>
+        <label for="quantity">Quantity</label>
+        <input
+          type="number"
+          name="quantity"
+          id="quantity"
+          min="1"
+          required
+          placeholder="Quantity bought"
+        />
+      </div>
+
+      <div>
+        <label for="cost_price">Rate</label>
+        <input
+          type="number"
+          step="0.01"
+          name="cost_price"
+          id="cost_price"
+          required
+          placeholder="Rate per item"
+        />
+      </div>
+      <div>
+        <label for="expiry_date">ExpiryDate</label>
+        <input type="date" name="expiry_date" id="expiry_date" />
+      </div>
+      <div>
+        <label for="comment">Comment</label>
+        <input type="text" name="comment" id="comment" placeholder="Comment" />
+      </div>
+      <button type="submit" class="mt-5 button success">Add Item</button>
+    </div>
+  </form>
+
+  <div class="py-2">
+    <h2 class="text-xl uppercase">Items in Invoice</h2>
+    <table class="table w-full table-auto">
+      <thead>
+        <tr>
+          <th class="border">Product Name</th>
+          <th class="border">QTY Stocked</th>
+          <th class="border">Rate</th>
+          <th class="border">Total</th>
+          <th class="border">Exp Date</th>
+          <th class="border">Comment</th>
+          <th class="border">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{ range .invoiceItems }}
+          <tr>
+            <td class="border">
+              <a href="/products/view/{{ .ProductID }}" class="text-blue-900">
+                {{ if .BrandName }}
+                  {{ .GenericName }} ({{ .BrandName }})
+                {{ else }}
+                  {{ .GenericName }}
+                {{ end }}
+              </a>
+            </td>
+            <td class="border">{{ .Quantity }}</td>
+            <td class="border">{{ roundf64 .CostPrice }}</td>
+            <td class="border">{{ roundf64 (invoice_subtotal .) }}</td>
+            <td class="border">{{ .ExpiryDate.Format "January 2006" }}</td>
+            <td class="border">{{ .Comment }}</td>
+            <td class="border">
+              <form action="/stockin/delete/{{ .InvoiceID }}/{{ .ID }}" method="post">
+                <button type="submit" class="button danger">Delete</button>
+              </form>
+            </td>
+          </tr>
+        {{ end }}
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const productName = document.getElementById("product_name");
+    const results = document.getElementById("results");
+    const productId = document.getElementById("product_id");
+
+    productName.addEventListener("input", async () => {
+      const value = productName.value.trim();
+      if (value == "") {
+        results.innerHTML = "";
+        return;
+      }
+
+      const url = `/products/search?name=${value}&limit=10&type=json`;
+
+      const res = await fetch(url);
+      const data = await res.json();
+
+      // Append results to datalist
+      results.innerHTML = "";
+
+      data.forEach((product) => {
+        const option = document.createElement("option");
+        if (product.brand_name != "") {
+          option.value = product.id + "-" + product.generic_name + ` (${product.brand_name})`;
+        } else {
+          option.value = product.id + "-" + product.generic_name;
+        }
+        results.appendChild(option);
+      });
+    });
+
+    productName.addEventListener("change", (e) => {
+      const value = e.target.value.trim();
+      if (value) {
+        const id = parseInt(value.split(" ")[0]);
+        if (id) {
+          productId.value = id;
+        } else {
+          productId.value = "";
+        }
+      } else {
+        productId.value = "";
+      }
+    });
+  </script>
+</div>

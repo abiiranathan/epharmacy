@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Transactions</title>
+    <style>
+      h1 {
+        text-align: center;
+        margin: 10px 0;
+        font-size: 40px;
+      }
+
+      /* Styling for the treeview */
+      .treeview {
+        max-width: 100%;
+        margin: 0 auto;
+        padding: 20px;
+        border-radius: 5px;
+      }
+
+      .treeview ul {
+        list-style-type: none;
+        padding-left: 20px;
+      }
+
+      .treeview a {
+        text-decoration: none;
+        color: #0b1cb6;
+        font-weight: bold;
+        display: block;
+        text-decoration: underline;
+      }
+
+      /* Styling for the table */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+
+      table tr:nth-child(even) {
+        background-color: #ecebeb;
+      }
+
+      th,
+      td {
+        padding: 8px;
+        border: 1px solid #ddd;
+        text-align: left;
+      }
+
+      th {
+        background-color: #f2f2f2;
+        color: #333;
+        border: 1px solid #ddd;
+      }
+
+      tr.total {
+        background-color: #bcece5;
+        font-weight: bold;
+      }
+
+      .date {
+        font-size: 24px;
+        color: #089f63;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="treeview">
+      <h1>Transactions</h1>
+      <ul>
+        {{ range $date, $transactions := .transactions }}
+          <li>
+            <h2 class="date">{{ $date }}</h2>
+            <ul>
+              {{ range $index, $transaction := $transactions }}
+                {{ $products :=$transaction.Products }}
+
+
+                <li class="mb-5">
+                  <div class="flex items-center justify-between gap-4 my-2">
+                    <a href="/transactions/{{ $transaction.ID }}">Transaction Details</a>
+                    <span>
+                      {{ $transaction.CreatedAt.Format "2006-01-02 15:04:05" }}
+                    </span>
+                  </div>
+                  <table>
+                    <tr>
+                      <th>Generic Name</th>
+                      <th>Brand Name</th>
+                      <th>Quantity</th>
+                      <th>Selling Price</th>
+                      <th>Subtotal</th>
+                    </tr>
+                    {{ range $index, $product := $products }}
+                      <tr>
+                        <td>{{ $product.GenericName }}</td>
+                        <td>{{ $product.BrandName }}</td>
+                        <td>{{ $product.Quantity }}</td>
+                        <td>{{ CurrencyF64 $product.SellingPrice }}</td>
+                        <td>{{ roundf64 (product_subtotal $product) }}</td>
+                      </tr>
+                    {{ end }}
+                    <tr class="total">
+                      <td colspan="4">Total</td>
+                      <td>{{ roundf64 (transaction_total $transaction) }}</td>
+                    </tr>
+                  </table>
+                </li>
+              {{ end }}
+            </ul>
+          </li>
+        {{ end }}
+      </ul>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,66 @@
+<h1 class="text-lg">REF ID: {{ .transaction.ID }}</h1>
+<p>
+  Created At:
+  {{ .transaction.CreatedAt.Format "02 January 2006 15:04:05" }}
+</p>
+
+<button class="default print:hidden" onclick="print();">PRINT</button>
+<div class="container print:hidden">
+  <table class="table mt-4 table-bordered">
+    <thead>
+      <tr>
+        <th>Generic Name</th>
+        <th>Brand Name</th>
+        <th>Cost Price</th>
+        <th>Barcode</th>
+        <th>Quantity</th>
+        <th>Selling Price</th>
+        <th>Subtotal</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{ range $.transaction.Products }}
+        <tr>
+          <td>{{ .GenericName }}</td>
+          <td>{{ .BrandName }}</td>
+          <td>{{ .CostPrice }}</td>
+          <td>{{ .Barcode }}</td>
+          <td>{{ .Quantity }}</td>
+          <td>{{ .SellingPrice }}</td>
+          <td>{{ roundf64 (product_subtotal .) }}</td>
+        </tr>
+      {{ end }}
+      <tr class="total">
+        <td colspan="6">Total</td>
+        <td>{{ roundf64 (transaction_total $.transaction) }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <form action="/transactions/delete/{{ .transaction.ID }}" method="post" class="mt-2">
+    <button type="submit" class="button">Cancel transaction</button>
+  </form>
+</div>
+
+<!-- Show hidden table for the small receit printer and when printing show it -->
+<!-- show only 3 columns -->
+<table class="hidden mt-4 bg-white table-bordered print:table">
+  <thead>
+    <tr>
+      <th>Item</th>
+      <th>Subtotal</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{ range $.transaction.Products }}
+      <tr>
+        <td>{{ .GenericName }} x {{ .Quantity }}</td>
+        <td>{{ roundf64 (product_subtotal .) }}</td>
+      </tr>
+    {{ end }}
+    <tr class="total">
+      <td>Total</td>
+      <td>{{ roundf64 (transaction_total $.transaction) }}</td>
+    </tr>
+  </tbody>
+</table>

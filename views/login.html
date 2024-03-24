@@ -1,0 +1,36 @@
+<div class="max-w-4xl mx-auto mt-10 bg-blue-100 p-10 border-2 drop-shadow-sm rounded-lg">
+  <h1 class="text-3xl">Login to Epharmacy</h1>
+
+  {{ if .error }}
+    <div class="p-2 my-2 text-red-400 bg-red-100 border border-red-100 rounded">
+      {{ .error }}
+    </div>
+  {{ end }}
+  <form action="/login" method="post" class="max-w-2xl p-4" enctype="multipart/form-data">
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input
+        type="text"
+        name="username"
+        id="username"
+        value="{{ .username }}"
+        required
+        placeholder="Enter your username"
+      />
+    </div>
+
+    <div class="my-4 form-group">
+      <label for="password">Password</label>
+      <input
+        type="password"
+        name="password"
+        id="password"
+        value="{{ .password }}"
+        placeholder="Enter your password"
+        required
+      />
+    </div>
+
+    <button type="submit" class="button">Sign In</button>
+  </form>
+</div>

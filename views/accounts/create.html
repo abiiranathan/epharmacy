@@ -1,0 +1,59 @@
+<h1 class="text-3xl">Create a new user account</h1>
+
+<form action="/users" method="post" enctype="multipart/form-data" class="max-w-2xl p-4">
+  <div class="form-group">
+    <label for="username">Username</label>
+    <input
+      type="text"
+      name="username"
+      id="username"
+      class="form-control"
+      required
+      placeholder="Enter a unique username"
+    />
+  </div>
+
+  <div class="my-4 form-group">
+    <label for="password">Password</label>
+    <input
+      type="password"
+      name="password"
+      id="password"
+      class="form-control"
+      placeholder="Enter a password for the user(At least 8 characters)"
+      required
+    />
+  </div>
+
+  <div class="my-4 form-group">
+    <label for="password">Confirm Password</label>
+    <input
+      type="password"
+      name="password-confirm"
+      id="password-confirm"
+      class="form-control"
+      placeholder="Enter a password for the user(At least 8 characters)"
+      required
+    />
+  </div>
+
+  <button type="submit" class="button">Create Account</button>
+</form>
+
+<script>
+  const form = document.querySelector("form");
+  form.addEventListener("submit", (e) => {
+    const password = document.getElementById("password").value;
+    const passwordConfirm = document.getElementById("password-confirm").value;
+
+    if (password !== passwordConfirm) {
+      e.preventDefault();
+      alert("Passwords do not match");
+    }
+
+    if (password.length < 8) {
+      e.preventDefault();
+      alert("Password must be at least 8 characters");
+    }
+  });
+</script>

@@ -1,0 +1,68 @@
+-- Create users table
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(100) NOT NULL CHECK (LENGTH(password) >= 8),
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_admin BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create products table
+CREATE TABLE IF NOT EXISTS products (
+    id SERIAL PRIMARY KEY,
+    generic_name VARCHAR(100) NOT NULL,
+    brand_name VARCHAR(100) NOT NULL DEFAULT '',
+    quantity INTEGER NOT NULL DEFAULT 0 CHECK(quantity >=0),
+    cost_price DOUBLE PRECISION NOT NULL DEFAULT 0.00,
+    selling_price DOUBLE PRECISION NOT NULL DEFAULT 0.00,
+    expiry_dates DATE[] NOT NULL DEFAULT '{}',
+    barcode VARCHAR(100) NOT NULL DEFAULT '' UNIQUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    -- UNIQUE CONSTRAINTS
+    CONSTRAINT unique_product UNIQUE (generic_name, brand_name)
+);
+
+
+-- Create transactions table
+CREATE TABLE IF NOT EXISTS transactions (
+    id SERIAL PRIMARY KEY,
+    items JSONB NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    user_id INTEGER NOT NULL,
+    -- FOREIGN KEYS
+    FOREIGN KEY (user_id) REFERENCES users(id)
+    ON DELETE RESTRICT
+);
+
+-- Create invoices table
+CREATE TABLE IF NOT EXISTS invoices (
+    id SERIAL PRIMARY KEY,
+    invoice_number VARCHAR(100) NOT NULL,
+    purchase_date DATE NOT NULL,
+    invoice_total DOUBLE PRECISION NOT NULL DEFAULT 0.00,
+    amount_paid DOUBLE PRECISION NOT NULL DEFAULT 0.00,
+    balance DOUBLE PRECISION NOT NULL GENERATED ALWAYS AS (invoice_total - amount_paid) STORED,
+    supplier VARCHAR(100) NOT NULL,
+    user_id INTEGER NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    -- FOREIGN KEYS
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE RESTRICT
+);
+
+-- stock in table
+CREATE TABLE IF NOT EXISTS stock_in (
+    id SERIAL PRIMARY KEY,
+    product_id INTEGER NOT NULL,
+    invoice_id INTEGER NOT NULL,
+    quantity INTEGER NOT NULL DEFAULT 0,
+    cost_price DOUBLE PRECISION NOT NULL DEFAULT 0.00,
+    expiry_date DATE NOT NULL,
+    comment TEXT NOT NULL DEFAULT '',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    -- FOREIGN KEYS
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+    FOREIGN KEY (invoice_id) REFERENCES invoices(id) ON DELETE CASCADE
+);
+

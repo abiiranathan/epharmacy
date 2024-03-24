@@ -1,0 +1,15 @@
+<style>
+  body {
+    background-color: crimson;
+  }
+</style>
+
+<div class="p-5 grid items-center min-h-[300px] mx-auto max-w-xl rounded-md bg-red-100">
+  <h2 class="font-bold">{{ .status }}: {{ .status_text }}</h2>
+  <p class="text-lg font-bold text-red-800">{{ .error }}</p>
+
+  <div class="flex items-center mt-4 gap-x-1">
+    <a href="/" class="button info">Home</a>
+    <a href="" class="button info">Reload</a>
+  </div>
+</div>

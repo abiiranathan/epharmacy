@@ -1,0 +1,49 @@
+<!-- Product detail page -->
+<div class="max-w-4xl p-8 mx-auto text-lg border rounded bg-gray-50">
+  <h1 class="mb-4 text-2xl font-black">
+    {{ .product.GenericName }} -
+    {{ .product.BrandName }}
+  </h1>
+
+  <div class="space-y-2">
+    <p class="grid grid-cols-[150px_auto]">
+      <span>Generic Name:</span> <span>{{ .product.GenericName }}</span>
+    </p>
+    <p class="grid grid-cols-[150px_auto]">
+      <span>Brand Name: </span> <span>{{ .product.BrandName }}</span>
+    </p>
+    <p class="grid grid-cols-[150px_auto]">
+      <span>Quantity: </span><span>{{ .product.Quantity }}</span>
+    </p>
+    <p class="grid grid-cols-[150px_auto]">
+      <span>Cost Price: </span><span>{{ roundf64 .product.CostPrice }}</span>
+    </p>
+    <p class="grid grid-cols-[150px_auto]">
+      <span>Selling Price:</span> <span>{{ roundf64  .product.SellingPrice }}</span>
+    </p>
+    <p class="grid grid-cols-[150px_auto]">
+      <span>Barcode:</span> <span>{{ .product.Barcode }}</span>
+    </p>
+
+    <p class="grid grid-cols-[150px_auto]">
+      <span>Created At:</span>
+      <span>{{ .product.CreatedAt.Format "02 January 2006 15:04:05" }}</span>
+    </p>
+    <p class="grid grid-cols-[150px_auto]">
+      <span>Updated At:</span>
+      <span>{{ .product.UpdatedAt.Format "02 January 2006 15:04:05" }}</span>
+    </p>
+  </div>
+
+  <div class="mt-3">
+    <hr />
+    <h6 class="mt-2 text-lg font-bold">Expiry Dates</h6>
+    <div class="flex items-center justify-between space-y-2 gap-x-8">
+      {{ range .product.ExpiryDates }}
+        <p>
+          <span class="text-blue-900">{{ .Format "02 January 2006" }}</span>
+        </p>
+      {{ end }}
+    </div>
+  </div>
+</div>

@@ -1,0 +1,26 @@
+<div class="max-w-2xl p-8 mx-auto space-y-4 border rounded">
+  <h1 class="my-4 text-3xl font-black">User Account Details</h1>
+
+  <p>
+    <strong>Username:</strong>
+    {{ .user.Username }}
+  </p>
+
+  <p>
+    <strong>Is Active:</strong>
+    {{ if .user.IsActive }}
+      YES
+    {{ else }}
+      NO
+    {{ end }}
+  </p>
+
+  <p>
+    <strong>Is Admin:</strong>
+    {{ if .user.IsAdmin }}
+      YES
+    {{ else }}
+      NO
+    {{ end }}
+  </p>
+</div>

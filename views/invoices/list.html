@@ -1,0 +1,64 @@
+<div class="flex items-center justify-between gap-x-4 p-1">
+  <h1 class="text-2xl text-teal-700 font-black">INVOICES</h1>
+
+  <div class="flex items-center gap-x-1 flex-1 max-w-4xl">
+    <select name="category" id="category">
+      <option value="invoice_number">Invoice Number</option>
+      <option value="supplier">Supplier</option>
+      <option value="purchase_date">Purchase Date</option>
+    </select>
+    <input type="search" placeholder="Search..." id="search" />
+    <button class="button" id="btn-search">SEARCH</button>
+
+    <div class="flex items-center gap-1 ml-10">
+      <a href="/invoices/create" class="button">New Invoice</a>
+      <a href="/invoices/import" class="button">Import Invoices</a>
+    </div>
+  </div>
+</div>
+<hr />
+<div class="table-scroll w-full">
+  <table class="table table-bordered stripped bg-white w-full">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Invoice No</th>
+        <th>Supplier</th>
+        <th>Invoice Total</th>
+        <th>Amount Paid</th>
+        <th>Balance</th>
+        <th>UserID</th>
+        <th>Created</th>
+      </tr>
+    </thead>
+
+    <tbody id="invoice_tbody">
+      {{ range .invoices }}
+        {{ template "invoice_row" . }}
+      {{ end }}
+    </tbody>
+  </table>
+</div>
+
+<script>
+  const search = document.getElementById("search");
+  const btnSearch = document.getElementById("btn-search");
+  const categoryInput = document.getElementById("category");
+  const tbody = document.getElementById("invoice_tbody");
+
+  btnSearch.addEventListener("click", async () => {
+    const value = search.value.trim();
+    const type = categoryInput.value;
+
+    const params = new URLSearchParams();
+    params.set("type", type);
+    params.set("query", value);
+
+    const url = "/invoices/search?" + params.toString();
+    const res = await fetch(url);
+    if (res.ok) {
+      const html = res.text();
+      tbody.innerHTML = html;
+    }
+  });
+</script>

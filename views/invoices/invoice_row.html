@@ -1,0 +1,16 @@
+{{ define "invoice_row" }}
+  <tr>
+    <td>{{ .PurchaseDate }}</td>
+    <td>
+      <a href="/invoices/view/{{ .ID }}" class="text-xl font-black text-blue-700"
+        >{{ .InvoiceNumber }}</a
+      >
+    </td>
+    <td>{{ .Supplier }}</td>
+    <td>{{ roundf64 .InvoiceTotal }}</td>
+    <td>{{ roundf64 .AmountPaid }}</td>
+    <td>{{ roundf64 (minusf .InvoiceTotal .AmountPaid) }}</td>
+    <td>{{ .UserID }}</td>
+    <td>{{ .CreatedAt.Format "2006-01-02 15:04:05" }}</td>
+  </tr>
+{{ end }}

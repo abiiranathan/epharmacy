@@ -1,0 +1,42 @@
+{{ define "product_row" }}
+  <tr>
+    <td>{{ .ID }}</td>
+    <td>{{ .GenericName }}</td>
+    <td>{{ .BrandName }}</td>
+    <td>{{ roundf64 .CostPrice }}</td>
+    <td>{{ roundf64 .SellingPrice }}</td>
+    <td>{{ .Quantity }}</td>
+    <td>
+      <div class="">
+        {{ range .ExpiryDates }}
+          <p class="flex flex-wrap items-center justify-between gap-x-8">
+            {{ .Format "January 2006" }}
+            <span class="font-bold {{ expiryColor . }}">{{ days_to_expiry . }}</span>
+          </p>
+        {{ end }}
+      </div>
+    </td>
+
+    <td>{{ .Barcode }}</td>
+    <td>
+      <div class="flex items-center gap-x-2">
+        <a href="/products/update/{{ .ID }}" class="button">Edit</a>
+        <form action="/products/delete/{{ .ID }}" method="POST">
+          <button
+            class="button"
+            type="submit"
+            onclick="return confirm('Are you sure you want to delete this product?')"
+          >
+            Delete
+          </button>
+        </form>
+      </div>
+    </td>
+  </tr>
+{{ end }}
+
+
+<!-- These are included dynamically, we don't want tailwind to keep them -->
+<div class="text-red-700 bg-red-100"></div>
+<div class="text-green-700 bg-green-100"></div>
+<div class="text-yellow-600 bg-yellow-100"></div>

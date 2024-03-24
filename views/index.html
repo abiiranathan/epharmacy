@@ -1,0 +1,90 @@
+<div class="grid items-start grid-cols-1 gap-4 mx-10">
+  <div class="max-w-full overflow-auto">
+    <div class="flex items-center justify-between gap-4 p-2">
+      <h1 class="text-base font-bold uppercase whitespace-nowrap">Current Stock:</h1>
+      <input
+        type="text"
+        name="search_product"
+        class="search_product"
+        placeholder="Search product and add it to sales receipt"
+      />
+    </div>
+
+    <div class="table-scroll">
+      <table class="table w-full bg-white table-bordered stripped table-sm">
+        <thead>
+          <tr>
+            <th>Product Name</th>
+            <th>Brand Name</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Expiry Dates</th>
+            <th>Add</th>
+          </tr>
+        </thead>
+        <tbody id="productsTable">
+          {{ range .products }}
+            <tr class="{{ if eq .Quantity 0 }}bg-red-200{{ end }}">
+              <td class="GenericName">{{ .GenericName }}</td>
+              <td class="BrandName">{{ .BrandName }}</td>
+              <td class="Quantity" id="quantity-{{ .ID }}">{{ .Quantity }}</td>
+              <td class="SellingPrice">{{ .SellingPrice }}</td>
+              <td>
+                <div class="flex items-center gap-4">
+                  {{ range .ExpiryDates }}
+                    <p class="ExpiryDate">{{ .Format "January 2006" }}</p>
+                  {{ end }}
+                </div>
+              </td>
+              <td class="text-right w-[140px]">
+                <button
+                  {{ if eq .Quantity 0 }}disabled{{ end }}
+                  class="w-full button add-button"
+                  data-id="{{ .ID }}"
+                >
+                  ADD TO BILL
+                </button>
+              </td>
+            </tr>
+          {{ end }}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="max-w-full overflow-auto">
+    <div class="flex items-center justify-between gap-x-4">
+      <h1 class="text-base font-bold uppercase whitespace-nowrap">Sales Receipt</h1>
+
+      <div class="flex items-center gap-x-4">
+        <h4 class="text-2xl font-bold text-black">RECEIPT TOTAL:</h4>
+        <span
+          id="grand_total"
+          class="text-2xl font-black text-white bg-blue-800 inline-block px-4 py-1 rounded-sm"
+          >0.00</span
+        >
+        <button data-url="/transactions" data-method="POST" class="button create-transaction ml-10">
+          Save Transaction
+        </button>
+      </div>
+    </div>
+    <div class="mt-1 table-scroll">
+      <table class="table w-full text-xl bg-white table-bordered table-info stripped table-sm">
+        <thead>
+          <tr>
+            <th class="hidden">ID</th>
+            <th>Product Name</th>
+            <th>Brand Name</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Subtotal</th>
+            <th>Remove</th>
+          </tr>
+        </thead>
+        <tbody id="salesQueue"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="/static/index.js" defer></script>
