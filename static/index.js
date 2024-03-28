@@ -43,7 +43,7 @@ function setProducts(products) {
     tr.innerHTML = `
         <td class="GenericName">${product.generic_name}</td>
         <td class="BrandName">${product.brand_name}</td>
-        <td class="Quantity">${product.quantity}</td>
+        <td class="Quantity" id="quantity-${product.id}">${product.quantity}</td>
         <td class="SellingPrice">${product.selling_price}</td>
         <td class="ExpiryDates">
             <div class="flex gap-4 items-center">

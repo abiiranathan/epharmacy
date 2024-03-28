@@ -216,6 +216,15 @@ func (h *Handlers) DeleteTransaction(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// Only delete transaction within 1 hour
+	duration := time.Since(trans.CreatedAt)
+	if duration > time.Hour {
+		egor.SendError(w, r,
+			fmt.Errorf("transaction can only be cancelled within 1 hour. Elapsed duration: %s", duration.String()),
+			http.StatusForbidden)
+		return
+	}
+
 	err = qtx.DeleteTransaction(r.Context(), int32(transactionID))
 	if err != nil {
 		egor.SendError(w, r, err, http.StatusBadRequest)
