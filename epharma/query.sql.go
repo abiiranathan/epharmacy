@@ -67,6 +67,97 @@ func (q *Queries) AddProductToInvoice(ctx context.Context, arg AddProductToInvoi
 	return err
 }
 
+const annualProductSales = `-- name: AnnualProductSales :many
+SELECT DATE_TRUNC('year', transaction_date)::date AS year, 
+    product_id, product_name, cost_price, selling_price,
+    SUM(quantity_sold)::int AS quantity_sold,
+    SUM(income)::double precision AS income,
+    SUM(profit)::double precision AS profit
+FROM product_sales
+WHERE CASE WHEN $1::text != ''
+    THEN DATE_TRUNC('year', transaction_date)::date = $1::date
+    ELSE TRUE
+END
+GROUP BY year, product_id, product_name, cost_price, selling_price
+ORDER BY year DESC
+`
+
+type AnnualProductSalesRow struct {
+	Year         dbtypes.Date `json:"year"`
+	ProductID    int32        `json:"product_id"`
+	ProductName  string       `json:"product_name"`
+	CostPrice    float64      `json:"cost_price"`
+	SellingPrice float64      `json:"selling_price"`
+	QuantitySold int32        `json:"quantity_sold"`
+	Income       float64      `json:"income"`
+	Profit       float64      `json:"profit"`
+}
+
+func (q *Queries) AnnualProductSales(ctx context.Context, date string) ([]AnnualProductSalesRow, error) {
+	rows, err := q.db.Query(ctx, annualProductSales, date)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []AnnualProductSalesRow{}
+	for rows.Next() {
+		var i AnnualProductSalesRow
+		if err := rows.Scan(
+			&i.Year,
+			&i.ProductID,
+			&i.ProductName,
+			&i.CostPrice,
+			&i.SellingPrice,
+			&i.QuantitySold,
+			&i.Income,
+			&i.Profit,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const annualSalesReports = `-- name: AnnualSalesReports :many
+SELECT DATE_TRUNC('year', transaction_date)::date AS year, SUM(total_income)::double precision AS total_income
+FROM sales_reports
+WHERE CASE WHEN $1::text != ''
+    THEN DATE_TRUNC('year', transaction_date)::date = $1::date
+    ELSE TRUE
+END
+GROUP BY year
+ORDER BY year DESC
+`
+
+type AnnualSalesReportsRow struct {
+	Year        dbtypes.Date `json:"year"`
+	TotalIncome float64      `json:"total_income"`
+}
+
+func (q *Queries) AnnualSalesReports(ctx context.Context, date string) ([]AnnualSalesReportsRow, error) {
+	rows, err := q.db.Query(ctx, annualSalesReports, date)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []AnnualSalesReportsRow{}
+	for rows.Next() {
+		var i AnnualSalesReportsRow
+		if err := rows.Scan(&i.Year, &i.TotalIncome); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const countProducts = `-- name: CountProducts :one
 SELECT COUNT(*) AS count FROM products
 `
@@ -221,6 +312,73 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.CreatedAt,
 	)
 	return i, err
+}
+
+const dailyProductSales = `-- name: DailyProductSales :many
+SELECT transaction_date, product_id, product_name, cost_price, selling_price, quantity_sold, income, profit FROM product_sales
+WHERE CASE WHEN $1::text != ''
+    THEN DATE_TRUNC('day', transaction_date)::date = $1::date
+    ELSE TRUE
+END
+`
+
+func (q *Queries) DailyProductSales(ctx context.Context, date string) ([]ProductSale, error) {
+	rows, err := q.db.Query(ctx, dailyProductSales, date)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ProductSale{}
+	for rows.Next() {
+		var i ProductSale
+		if err := rows.Scan(
+			&i.TransactionDate,
+			&i.ProductID,
+			&i.ProductName,
+			&i.CostPrice,
+			&i.SellingPrice,
+			&i.QuantitySold,
+			&i.Income,
+			&i.Profit,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const dailySalesReports = `-- name: DailySalesReports :many
+SELECT transaction_date, total_income FROM sales_reports
+WHERE CASE WHEN $1::text != ''
+    THEN DATE_TRUNC('day', transaction_date)::date = $1::date
+    ELSE TRUE
+END
+ORDER BY transaction_date DESC
+`
+
+// Fetch reports
+func (q *Queries) DailySalesReports(ctx context.Context, date string) ([]SalesReport, error) {
+	rows, err := q.db.Query(ctx, dailySalesReports, date)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []SalesReport{}
+	for rows.Next() {
+		var i SalesReport
+		if err := rows.Scan(&i.TransactionDate, &i.TotalIncome); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const deactivateUser = `-- name: DeactivateUser :exec
@@ -700,6 +858,97 @@ func (q *Queries) ListUsers(ctx context.Context) ([]User, error) {
 			&i.IsAdmin,
 			&i.CreatedAt,
 		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const monthlyProductSales = `-- name: MonthlyProductSales :many
+SELECT DATE_TRUNC('month', transaction_date)::date AS month, 
+    product_id, product_name, cost_price, selling_price,
+    SUM(quantity_sold)::int AS quantity_sold,
+    SUM(income)::double precision AS income,
+    SUM(profit)::double precision AS profit
+FROM product_sales
+WHERE CASE WHEN $1::text != ''
+    THEN DATE_TRUNC('month', transaction_date)::date = $1::date
+    ELSE TRUE
+END
+GROUP BY month, product_id, product_name, cost_price, selling_price
+ORDER BY month DESC
+`
+
+type MonthlyProductSalesRow struct {
+	Month        dbtypes.Date `json:"month"`
+	ProductID    int32        `json:"product_id"`
+	ProductName  string       `json:"product_name"`
+	CostPrice    float64      `json:"cost_price"`
+	SellingPrice float64      `json:"selling_price"`
+	QuantitySold int32        `json:"quantity_sold"`
+	Income       float64      `json:"income"`
+	Profit       float64      `json:"profit"`
+}
+
+func (q *Queries) MonthlyProductSales(ctx context.Context, date string) ([]MonthlyProductSalesRow, error) {
+	rows, err := q.db.Query(ctx, monthlyProductSales, date)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []MonthlyProductSalesRow{}
+	for rows.Next() {
+		var i MonthlyProductSalesRow
+		if err := rows.Scan(
+			&i.Month,
+			&i.ProductID,
+			&i.ProductName,
+			&i.CostPrice,
+			&i.SellingPrice,
+			&i.QuantitySold,
+			&i.Income,
+			&i.Profit,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const monthlySalesReports = `-- name: MonthlySalesReports :many
+SELECT DATE_TRUNC('month', transaction_date)::date AS month, SUM(total_income)::double precision AS total_income
+FROM sales_reports
+WHERE CASE WHEN $1::text != ''
+    THEN DATE_TRUNC('month', transaction_date)::date = $1::date
+    ELSE TRUE
+END
+GROUP BY month
+ORDER BY month DESC
+`
+
+type MonthlySalesReportsRow struct {
+	Month       dbtypes.Date `json:"month"`
+	TotalIncome float64      `json:"total_income"`
+}
+
+func (q *Queries) MonthlySalesReports(ctx context.Context, date string) ([]MonthlySalesReportsRow, error) {
+	rows, err := q.db.Query(ctx, monthlySalesReports, date)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []MonthlySalesReportsRow{}
+	for rows.Next() {
+		var i MonthlySalesReportsRow
+		if err := rows.Scan(&i.Month, &i.TotalIncome); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

@@ -31,11 +31,21 @@ func (h *Handlers) ListUsers(w http.ResponseWriter, r *http.Request) {
 		egor.SendError(w, r, err, http.StatusBadRequest)
 		return
 	}
-	egor.Render(w, r, "accounts/list", egor.Map{"users": users})
+	egor.Render(w, r, "accounts/list", egor.Map{
+		"users": users,
+		"breadcrumbs": Breadcrumbs{
+			{Label: "Users", IsLast: true},
+		},
+	})
 }
 
 func (h *Handlers) RenderUserCreatePage(w http.ResponseWriter, r *http.Request) {
-	egor.Render(w, r, "accounts/create", egor.Map{})
+	egor.Render(w, r, "accounts/create", egor.Map{
+		"breadcrumbs": Breadcrumbs{
+			{Label: "Users", URL: "/users"},
+			{Label: "Create User", IsLast: true},
+		},
+	})
 }
 
 func (h *Handlers) RenderUserEditPage(w http.ResponseWriter, r *http.Request) {
@@ -48,6 +58,11 @@ func (h *Handlers) RenderUserEditPage(w http.ResponseWriter, r *http.Request) {
 
 	egor.Render(w, r, "accounts/update", egor.Map{
 		"user": user,
+		"breadcrumbs": Breadcrumbs{
+			{Label: "Users", URL: "/users"},
+			{Label: user.Username, URL: fmt.Sprintf("/users/%d", user.ID)},
+			{Label: "Update User", IsLast: true},
+		},
 	})
 }
 
@@ -59,7 +74,14 @@ func (h *Handlers) GetUser(w http.ResponseWriter, r *http.Request) {
 		egor.SendError(w, r, err, http.StatusNotFound)
 		return
 	}
-	egor.Render(w, r, "accounts/view", egor.Map{"user": user})
+
+	egor.Render(w, r, "accounts/view", egor.Map{
+		"user": user,
+		"breadcrumbs": Breadcrumbs{
+			{Label: "Users", URL: "/users"},
+			{Label: user.Username, IsLast: true},
+		},
+	})
 }
 
 // UpdateUser
@@ -141,7 +163,11 @@ func (h *Handlers) DemoteUser(w http.ResponseWriter, r *http.Request) {
 // Auth
 // RenderLoginPage
 func (h *Handlers) RenderLoginPage(w http.ResponseWriter, r *http.Request) {
-	egor.Render(w, r, "login", egor.Map{})
+	egor.Render(w, r, "login", egor.Map{
+		"breadcrumbs": Breadcrumbs{
+			{Label: "Login", IsLast: true},
+		},
+	})
 }
 
 func encodeUserId(id int32) string {
@@ -175,6 +201,9 @@ func (h *Handlers) Login(w http.ResponseWriter, r *http.Request) {
 		"error":    "Invalid username or password",
 		"username": username,
 		"password": password,
+		"breadcrumbs": Breadcrumbs{
+			{Label: "Login", URL: "/login", IsLast: true},
+		},
 	}
 
 	user, err := h.Queries.GetUserByUsername(r.Context(), username)

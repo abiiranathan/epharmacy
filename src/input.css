@@ -198,3 +198,38 @@
     font-size: 1rem;
   }
 }
+
+/* Breadcrumbs */
+
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #555;
+  overflow-x: auto;
+}
+
+a {
+  text-decoration: none;
+  color: #007bff;
+}
+
+.separator {
+  margin: 0 10px;
+  color: #888;
+}
+
+.breadcrumbs a {
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.breadcrumbs span {
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.current-page {
+  font-weight: bold;
+  text-transform: uppercase;
+}

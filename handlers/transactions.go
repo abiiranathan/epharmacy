@@ -82,6 +82,9 @@ func (h *Handlers) ListTransactionsPaginated(w http.ResponseWriter, r *http.Requ
 
 	egor.Render(w, r, "transactions/list", egor.Map{
 		"transactions": groupTransactionsByDate(transactionsList),
+		"breadcrumbs": Breadcrumbs{
+			{Label: "Transactions", URL: "/transactions", IsLast: true},
+		},
 	})
 }
 
@@ -180,6 +183,10 @@ func (h *Handlers) GetTransaction(w http.ResponseWriter, r *http.Request) {
 
 	egor.Render(w, r, "transactions/detail", egor.Map{
 		"transaction": convertTransaction(transaction),
+		"breadcrumbs": Breadcrumbs{
+			{Label: "Transactions", URL: "/transactions"},
+			{Label: fmt.Sprintf("Transaction #%d", transactionID), IsLast: true},
+		},
 	})
 }
 

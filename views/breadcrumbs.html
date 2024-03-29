@@ -1,0 +1,21 @@
+{{ define "breadcrumbs" }}
+  {{ if ne .Path "/" }}
+    <div class="px-8 py-2 bg-gray-100 border-b breadcrumbs noprint">
+      <a href="/">Home</a>
+      {{ if .breadcrumbs }}
+        <span class="separator">/</span>
+      {{ end }}
+
+      {{ range $index, $breadcrumb := .breadcrumbs }}
+        {{ if $breadcrumb.URL }}
+          <a href="{{ $breadcrumb.URL }}">{{ $breadcrumb.Label }}</a>
+        {{ else }}
+          <span class="current-page">{{ $breadcrumb.Label }}</span>
+        {{ end }}
+        {{ if not $breadcrumb.IsLast }}
+          <span class="separator">/</span>
+        {{ end }}
+      {{ end }}
+    </div>
+  {{ end }}
+{{ end }}

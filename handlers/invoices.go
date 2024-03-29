@@ -27,12 +27,20 @@ func (h *Handlers) ListInvoicesPaginated(w http.ResponseWriter, r *http.Request)
 
 	egor.Render(w, r, "invoices/list", egor.Map{
 		"invoices": invoices,
+		"breadcrumbs": Breadcrumbs{
+			{Label: "Invoices", URL: "/invoices", IsLast: true},
+		},
 	})
 }
 
 // RenderInvoiceCreatePage
 func (h *Handlers) RenderInvoiceCreatePage(w http.ResponseWriter, r *http.Request) {
-	egor.Render(w, r, "invoices/create", egor.Map{})
+	egor.Render(w, r, "invoices/create", egor.Map{
+		"breadcrumbs": Breadcrumbs{
+			{Label: "Invoices", URL: "/invoices"},
+			{Label: "Create Invoice", IsLast: true},
+		},
+	})
 }
 
 // CreateInvoice
@@ -82,6 +90,10 @@ func (h *Handlers) GetInvoice(w http.ResponseWriter, r *http.Request) {
 	egor.Render(w, r, "invoices/view", egor.Map{
 		"invoice":      invoice,
 		"invoiceItems": invoiceItems,
+		"breadcrumbs": Breadcrumbs{
+			{Label: "Invoices", URL: "/invoices"},
+			{Label: invoice.InvoiceNumber, IsLast: true},
+		},
 	})
 }
 
@@ -96,6 +108,11 @@ func (h *Handlers) RenderInvoiceUpdatePage(w http.ResponseWriter, r *http.Reques
 
 	egor.Render(w, r, "invoices/update", egor.Map{
 		"invoice": invoice,
+		"breadcrumbs": Breadcrumbs{
+			{Label: "Invoices", URL: "/invoices"},
+			{Label: invoice.InvoiceNumber, URL: fmt.Sprintf("/invoices/view/%d", invoice.ID)},
+			{Label: "Update", IsLast: true},
+		},
 	})
 }
 

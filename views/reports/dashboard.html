@@ -1,0 +1,223 @@
+<style>
+  body {
+    background-color: rgb(235, 233, 233);
+  }
+
+  .card {
+    padding: 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: white;
+  }
+
+  .card-title {
+    font-size: 1rem;
+    font-weight: 400;
+    color: #3c4b65;
+  }
+
+  .card-body {
+    color: #032e79;
+    font-size: 1.125rem;
+    font-weight: 600;
+  }
+</style>
+
+<div class="container mx-auto">
+  <h1 class="py-2 mb-4 text-3xl font-bold text-gray-900">SALES REPORTS</h1>
+
+  <!-- display productSales, dailySalesReport, monthlySalesReport, annualSalesReport -->
+  <div class="grid grid-cols-1 gap-4 mt-4 md:grid-cols-2 lg:grid-cols-4">
+    <div class="space-y-4 card daily">
+      <h2 class="card-title">Today, {{ .Today.Format  "02 Jan 2006" }}</h2>
+      <p class="card-body">{{ CurrencyF64  .incomeToday }}</p>
+    </div>
+    <div class="space-y-4 card monthly">
+      <h2 class="card-title">
+        This week: {{ .WeekStart.Format  "02 Jan 2006" }} to
+        {{ .WeekEnd.Format  "02 Jan 2006" }}
+      </h2>
+      <p class="card-body">{{ CurrencyF64 .incomeThisWeek }}</p>
+    </div>
+    <div class="space-y-4 card monthly">
+      <h2 class="card-title">Month: {{ .Today.Format  "Jan 2006" }}</h2>
+      <p class="card-body">{{ CurrencyF64 .incomeThisMonth }}</p>
+    </div>
+    <div class="space-y-4 card annual">
+      <h2 class="card-title">Year: {{ .Today.Format  "2006" }}</h2>
+      <p class="card-body">{{ CurrencyF64 .incomeThisYear }}</p>
+    </div>
+  </div>
+</div>
+
+<div class="grid grid-cols-3 gap-4 p-4 mt-4 bg-white">
+  <div class="canvas-wrapper">
+    <canvas id="weeklyChart"></canvas>
+  </div>
+  <div class="canvas-wrapper">
+    <canvas id="monthlyChart"></canvas>
+  </div>
+  <div class="canvas-wrapper">
+    <canvas id="annualChart"></canvas>
+  </div>
+</div>
+
+<!-- daily sales -->
+<div class="grid items-start grid-cols-2 gap-8 mt-4">
+  <div class="card">
+    <h2 class="mb-2 text-xl text-gray-800">Daily Sales: Last 14 days</h2>
+    <table class="table w-full">
+      <thead>
+        <tr>
+          <th class="px-4 py-2">Date</th>
+          <th class="px-4 py-2">Total Income</th>
+          <th>View Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{ range .dailyProductSales }}
+          <tr class="border-b border-gray-300 last-of-type:border-none">
+            <td class="px-4 py-2">{{ .TransactionDate.Format "Monday, 02 Jan 2006" }}</td>
+            <td class="px-4 py-2">{{ CurrencyF64 .TotalIncome }}</td>
+            <td class="w-10">
+              <a class="button" href="/reports/sales/daily?date={{ .TransactionDate }}">View</a>
+            </td>
+          </tr>
+        {{ end }}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- tables -->
+  <div class="grid grid-cols-3 gap-8">
+    <div class="col-span-2 card">
+      <h2 class="mb-2 text-xl text-gray-800">Monthly Sales</h2>
+      <table class="table w-full">
+        <thead>
+          <tr>
+            <th class="px-4 py-2">Month</th>
+            <th class="px-4 py-2">Total Income</th>
+            <th>View Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{ range .monthlyProductSales }}
+            <tr>
+              <td class="px-4 py-2">{{ .Month.Format "January 2006" }}</td>
+              <td class="px-4 py-2">{{ CurrencyF64 .TotalIncome }}</td>
+              <td class="w-10">
+                <a class="button" href="/reports/sales/monthly?month={{ .Month.Format "01-2006" }}"
+                  >View</a
+                >
+              </td>
+            </tr>
+          {{ end }}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2 class="mb-2 text-xl text-gray-800">Annual Sales</h2>
+      <table class="table w-full">
+        <thead>
+          <tr>
+            <th class="px-4 py-2">Year</th>
+            <th class="px-4 py-2">Total Income</th>
+            <th>View Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{ range .annualProductSales }}
+            <tr>
+              <td class="px-4 py-2">{{ .Year.Format "2006" }}</td>
+              <td class="px-4 py-2">{{ CurrencyF64 .TotalIncome }}</td>
+              <td class="w-10">
+                <a class="button" href="/reports/sales/annually?year={{ .Year.Year }}">View</a>
+              </td>
+            </tr>
+          {{ end }}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // WeeklyIncome
+  const weeklyIncome = JSON.parse("{{ .WeeklyIncome }}");
+// MonthlyIncome
+  const monthlyIncome = JSON.parse("{{ .MonthlyIncome }}");
+
+  // AnnualIncome
+  const annualIncome = JSON.parse("{{ .AnnualIncome }}");
+
+  const weeklyChart = document.getElementById('weeklyChart').getContext('2d');
+  const monthlyChart = document.getElementById('monthlyChart').getContext('2d');
+  const annualChart = document.getElementById('annualChart').getContext('2d');
+
+  const weeklyChartInstance = new Chart(weeklyChart, {
+    type: 'line',
+    data: {
+      labels: weeklyIncome.WeekDays,
+      datasets: [{
+        label: "This week's Income",
+        data: weeklyIncome.Income,
+        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+
+  const monthlyChartInstance = new Chart(monthlyChart, {
+    type: 'bar',
+    data: {
+      labels: monthlyIncome.Months,
+      datasets: [{
+        label: 'Monthly Income',
+        data: monthlyIncome.Income,
+        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+        borderColor: 'rgba(255, 99, 132, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+
+  const annualChartInstance = new Chart(annualChart, {
+    type: 'bar',
+    data: {
+      labels: annualIncome.Years,
+      datasets: [{
+        label: 'Annual Income',
+        data: annualIncome.Income,
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        borderColor: 'rgba(75, 192, 192, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+
+</script>

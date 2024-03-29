@@ -16,7 +16,12 @@ import (
 
 // RenderProductCreatePage
 func (h *Handlers) RenderProductCreatePage(w http.ResponseWriter, r *http.Request) {
-	egor.Render(w, r, "products/create.html", egor.Map{})
+	egor.Render(w, r, "products/create.html", egor.Map{
+		"breadcrumbs": Breadcrumbs{
+			{Label: "Products", URL: "/products"},
+			{Label: "Create Product", IsLast: true},
+		},
+	})
 }
 
 // RenderProductUpdatePage
@@ -30,12 +35,22 @@ func (h *Handlers) RenderProductUpdatePage(w http.ResponseWriter, r *http.Reques
 
 	egor.Render(w, r, "products/update.html", egor.Map{
 		"product": product,
+		"breadcrumbs": Breadcrumbs{
+			{Label: "Products", URL: "/products"},
+			{Label: product.GenericName, URL: fmt.Sprintf("/products/view/%d", product.ID)},
+			{Label: "Update Product", IsLast: true},
+		},
 	})
 }
 
 // RenderProductImportPage
 func (h *Handlers) RenderProductImportPage(w http.ResponseWriter, r *http.Request) {
-	egor.Render(w, r, "products/import.html", egor.Map{})
+	egor.Render(w, r, "products/import.html", egor.Map{
+		"breadcrumbs": Breadcrumbs{
+			{Label: "Products", URL: "/products"},
+			{Label: "Import Products", IsLast: true},
+		},
+	})
 }
 
 func parseMoney(s string) (float64, error) {
@@ -222,6 +237,9 @@ func (h *Handlers) ListProductsPaginated(w http.ResponseWriter, r *http.Request)
 		"TotalPages": totalPages,
 		"HasNext":    int64(page) < totalPages,
 		"HasPrev":    page > 1,
+		"breadcrumbs": Breadcrumbs{
+			{Label: "Products", URL: "/products", IsLast: true},
+		},
 	})
 }
 
@@ -236,6 +254,10 @@ func (h *Handlers) GetProduct(w http.ResponseWriter, r *http.Request) {
 
 	egor.Render(w, r, "products/view.html", egor.Map{
 		"product": product,
+		"breadcrumbs": Breadcrumbs{
+			{Label: "Products", URL: "/products"},
+			{Label: product.GenericName, IsLast: true},
+		},
 	})
 }
 

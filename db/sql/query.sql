@@ -204,3 +204,68 @@ WHERE id = @id::int;
 SELECT * FROM stock_in WHERE id = $1;
 
 
+-- Fetch reports
+-- name: DailySalesReports :many
+SELECT * FROM sales_reports
+WHERE CASE WHEN @date::text != ''
+    THEN DATE_TRUNC('day', transaction_date)::date = @date::date
+    ELSE TRUE
+END
+ORDER BY transaction_date DESC;
+
+-- name: MonthlySalesReports :many
+SELECT DATE_TRUNC('month', transaction_date)::date AS month, SUM(total_income)::double precision AS total_income
+FROM sales_reports
+WHERE CASE WHEN @date::text != ''
+    THEN DATE_TRUNC('month', transaction_date)::date = @date::date
+    ELSE TRUE
+END
+GROUP BY month
+ORDER BY month DESC;
+
+-- name: AnnualSalesReports :many
+SELECT DATE_TRUNC('year', transaction_date)::date AS year, SUM(total_income)::double precision AS total_income
+FROM sales_reports
+WHERE CASE WHEN @date::text != ''
+    THEN DATE_TRUNC('year', transaction_date)::date = @date::date
+    ELSE TRUE
+END
+GROUP BY year
+ORDER BY year DESC;
+
+
+-- name: DailyProductSales :many
+SELECT * FROM product_sales
+WHERE CASE WHEN @date::text != ''
+    THEN DATE_TRUNC('day', transaction_date)::date = @date::date
+    ELSE TRUE
+END;
+
+
+-- name: MonthlyProductSales :many
+SELECT DATE_TRUNC('month', transaction_date)::date AS month, 
+    product_id, product_name, cost_price, selling_price,
+    SUM(quantity_sold)::int AS quantity_sold,
+    SUM(income)::double precision AS income,
+    SUM(profit)::double precision AS profit
+FROM product_sales
+WHERE CASE WHEN @date::text != ''
+    THEN DATE_TRUNC('month', transaction_date)::date = @date::date
+    ELSE TRUE
+END
+GROUP BY month, product_id, product_name, cost_price, selling_price
+ORDER BY month DESC;
+
+-- name: AnnualProductSales :many
+SELECT DATE_TRUNC('year', transaction_date)::date AS year, 
+    product_id, product_name, cost_price, selling_price,
+    SUM(quantity_sold)::int AS quantity_sold,
+    SUM(income)::double precision AS income,
+    SUM(profit)::double precision AS profit
+FROM product_sales
+WHERE CASE WHEN @date::text != ''
+    THEN DATE_TRUNC('year', transaction_date)::date = @date::date
+    ELSE TRUE
+END
+GROUP BY year, product_id, product_name, cost_price, selling_price
+ORDER BY year DESC;

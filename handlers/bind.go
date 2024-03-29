@@ -64,4 +64,11 @@ func ConnectRoutes(h *Handlers) {
 	stockin := h.Router.Group("/stockin")
 	stockin.Post("/create", h.NewStockIn)
 	stockin.Post("/delete/{invoice_id}/{stockin_id}", h.DeleteStockIn)
+
+	// Reports
+	reports := h.Router.Group("/reports")
+	reports.Get("/", h.RenderReportsDashboard)
+	reports.Get("/sales/daily", h.DailyProductSalesReport)
+	reports.Get("/sales/monthly", h.MonthlyProductSalesReport)
+	reports.Get("/sales/annually", h.AnnualProductSalesReport)
 }

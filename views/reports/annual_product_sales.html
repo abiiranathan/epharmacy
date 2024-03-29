@@ -1,0 +1,66 @@
+<style>
+  body {
+    background-color: rgb(235, 233, 233);
+  }
+
+  .card {
+    padding: 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: white;
+  }
+</style>
+
+<div class="card">
+  <div class="flex items-center justify-between py-3 gap-x-2 ">
+    <h2 class="flex-1 text-xl text-gray-800">Sales: <strong>{{ .Date.Format "2006" }}</strong></h2>
+    <input type="text" class="w-1/3" name="search" id="search" placeholder="Type to filter..." />
+  </div>
+
+  <table class="table w-full mt-3">
+    <thead>
+      <tr>
+        <th class="px-4 py-2">Prod ID</th>
+        <th class="px-4 py-2">Product Name</th>
+        <th class="px-4 py-2">Qty Sold</th>
+        <th class="px-4 py-2">Cost Price</th>
+        <th class="px-4 py-2">Selling Price</th>
+        <th class="px-4 py-2">Profit</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {{ range .AnnualProductSales }}
+        <tr class="border-b border-gray-300 last-of-type:border-none">
+          <td class="px-4 py-2">{{ .ProductID }}</td>
+          <td class="px-4 py-2">{{ .ProductName }}</td>
+          <td class="px-4 py-2">{{ .QuantitySold }}</td>
+          <td class="px-4 py-2">{{ CurrencyF64 .CostPrice }}</td>
+          <td class="px-4 py-2">{{ CurrencyF64 .SellingPrice }}</td>
+          <td class="px-4 py-2 font-bold text-green-800 bg-green-100 border rounded-sm">
+            {{ CurrencyF64 .Profit }}
+          </td>
+        </tr>
+      {{ end }}
+    </tbody>
+  </table>
+</div>
+
+<!-- table filtering on product name -->
+<script>
+  const search = document.getElementById("search");
+  const rows = document.querySelectorAll("tbody tr");
+
+  search.addEventListener("keyup", function (e) {
+    const term = e.target.value.toLowerCase();
+    rows.forEach((row) => {
+      row.style.display = "table-row";
+
+      const name = row.children[1].textContent.toLowerCase();
+      if (name.indexOf(term) === -1) {
+        row.style.display = "none";
+      }
+    });
+  });
+</script>

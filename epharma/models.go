@@ -35,6 +35,48 @@ type Product struct {
 	UpdatedAt    time.Time      `json:"updated_at"`
 }
 
+type ProductAggregate struct {
+	TransactionDate dbtypes.Date `json:"transaction_date"`
+	ProductID       int32        `json:"product_id"`
+	QuantitySold    int64        `json:"quantity_sold"`
+	Income          int64        `json:"income"`
+}
+
+type ProductSale struct {
+	TransactionDate dbtypes.Date `json:"transaction_date"`
+	ProductID       int32        `json:"product_id"`
+	ProductName     string       `json:"product_name"`
+	CostPrice       float64      `json:"cost_price"`
+	SellingPrice    float64      `json:"selling_price"`
+	QuantitySold    int64        `json:"quantity_sold"`
+	Income          float64      `json:"income"`
+	Profit          float64      `json:"profit"`
+}
+
+type SalesReport struct {
+	TransactionDate dbtypes.Date `json:"transaction_date"`
+	TotalIncome     float64      `json:"total_income"`
+}
+
+type StockBalance struct {
+	ID              int32     `json:"id"`
+	ProductID       int32     `json:"product_id"`
+	OpeningQuantity int32     `json:"opening_quantity"`
+	QuantityIn      int32     `json:"quantity_in"`
+	CreatedAt       time.Time `json:"created_at"`
+}
+
+type StockCard struct {
+	StockBalancesCreatedAt dbtypes.Date `json:"stock_balances_created_at"`
+	ProductID              int32        `json:"product_id"`
+	GenericName            string       `json:"generic_name"`
+	BrandName              string       `json:"brand_name"`
+	OpeningQuantity        int32        `json:"opening_quantity"`
+	QuantityIn             int32        `json:"quantity_in"`
+	QuantityOut            int64        `json:"quantity_out"`
+	ClosingQuantity        int32        `json:"closing_quantity"`
+}
+
 type StockIn struct {
 	ID         int32        `json:"id"`
 	ProductID  int32        `json:"product_id"`
